@@ -1089,5 +1089,3 @@ if __name__ == "__main__":
         print(f"Error occurred: {e}")
         import traceback
         traceback.print_exc()
-
-        ##備份 API

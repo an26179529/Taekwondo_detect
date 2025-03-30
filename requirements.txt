@@ -1,0 +1,5 @@
+opencv-python>=4.5.0
+numpy>=1.19.0
+roboflow>=0.2.0
+mediapipe>=0.8.9
+matplotlib>=3.4.0
