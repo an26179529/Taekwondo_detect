@@ -3,6 +3,9 @@ import cv2
 import tempfile
 import os
 from Taekwondo import BatchTaekwondoDetector
+import tempfile
+
+
 
 st.set_page_config(page_title="跆拳道卡腳分析系統", layout="wide")
 st.title("跆拳道卡腳與重心穩定度分析系統")
@@ -14,14 +17,15 @@ resize_height = st.sidebar.number_input("處理高度", 180, 1080, 360, help="�
 
 uploaded_file = st.file_uploader("上傳跆拳道比賽影片", type=["mp4", "mov", "avi"])
 
+
 if uploaded_file is not None:
     # 保存上傳的檔案
-    tfile = tempfile.NamedTemporaryFile(delete=False)
-    tfile.write(uploaded_file.read())
-    input_path = tfile.name
+    with tempfile.NamedTemporaryFile(delete=False) as tfile:
+        tfile.write(uploaded_file.read())
+        input_path = tfile.name
     
     # 設定輸出路徑
-    output_path = os.path.join(tempfile.gettempdir(), "analyzed_result.mp4")
+    output_path = os.path.join(r"E:\Taekwondo_github\Taekwondo_detect\result.mp4")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -57,9 +61,17 @@ if uploaded_file is not None:
                     st.metric("最長持續時間", f"{max(durations):.2f}秒")
             
             # 顯示處理後的影片
-            with col2:
-                st.video(output_path)
-                st.caption("分析結果")
+            try:
+                # 檢查輸出文件是否存在
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    # 顯示處理後的影片
+                    with col2:
+                        st.video(output_path)
+                        st.caption("分析結果")
+                else:
+                    st.error(f"處理後的影片未生成或大小為0。輸出路徑: {output_path}")
+            except Exception as e:
+                st.error(f"顯示處理結果時出錯: {str(e)}")
             
             # 詳細分析結果
             st.subheader("詳細卡腳資訊")
@@ -75,4 +87,7 @@ if uploaded_file is not None:
                         st.write(f"藍方重心穩定度: {block.get('blue_stability', 0):.2f}%")
                 
     # 清理臨時文件
-    os.unlink(input_path)
+    try:
+        os.unlink(input_path)
+    except:
+        st.write("注意：臨時文件可能需要手動清理")
